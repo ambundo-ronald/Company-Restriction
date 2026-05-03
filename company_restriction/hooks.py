@@ -1,6 +1,6 @@
 from company_restriction.__version__ import __version__ as app_version
 
-app_name = "company-restriction"
+app_name = "company_restriction"
 app_title = "Company Restriction"
 app_publisher = "Your Name"
 app_description = "Restrict users to specific companies in ERPNext"
