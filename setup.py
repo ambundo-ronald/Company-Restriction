@@ -26,7 +26,5 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     python_requires=">=3.8",
-    install_requires=[
-        "frappe",
-    ],
+    install_requires=[],
 )

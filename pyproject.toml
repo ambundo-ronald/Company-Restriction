@@ -1,6 +1,6 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "company_restriction"
@@ -25,8 +25,14 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = []
 
-[tool.flit.module]
-name = "company_restriction"
+[tool.setuptools.packages.find]
+include = ["company_restriction*"]
+
+[tool.setuptools.package-data]
+company_restriction = ["fixtures/*.json", "patches.txt", "modules.txt"]
+
+[tool.setuptools.dynamic]
+version = {attr = "company_restriction.__version__.__version__"}
 
 [tool.black]
 line-length = 100

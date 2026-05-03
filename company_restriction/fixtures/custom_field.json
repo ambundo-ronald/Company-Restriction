@@ -20,7 +20,7 @@
         "label": "Allowed Company",
         "insert_after": "restrict_to_company",
         "reqd": 0,
-        "depends_on": "restrict_to_company",
+        "depends_on": "eval:doc.restrict_to_company",
         "is_custom_field": 1
     },
     {
@@ -31,7 +31,7 @@
         "fieldtype": "Link",
         "options": "Company",
         "label": "Company",
-        "reqd": 1,
+        "reqd": 0,
         "is_custom_field": 1
     },
     {
@@ -42,7 +42,7 @@
         "fieldtype": "Link",
         "options": "Company",
         "label": "Company",
-        "reqd": 1,
+        "reqd": 0,
         "is_custom_field": 1
     },
     {
@@ -53,7 +53,7 @@
         "fieldtype": "Link",
         "options": "Company",
         "label": "Company",
-        "reqd": 1,
+        "reqd": 0,
         "is_custom_field": 1
     },
     {
@@ -64,7 +64,7 @@
         "fieldtype": "Link",
         "options": "Company",
         "label": "Company",
-        "reqd": 1,
+        "reqd": 0,
         "is_custom_field": 1
     }
 ]

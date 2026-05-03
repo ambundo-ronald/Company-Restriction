@@ -1,5 +1,3 @@
-from company_restriction.__version__ import __version__ as app_version
-
 app_name = "company_restriction"
 app_title = "Company Restriction"
 app_publisher = "Your Name"
@@ -8,9 +6,17 @@ app_email = "your@email.com"
 app_license = "MIT"
 
 import frappe
+from company_restriction.__version__ import __version__ as app_version
 
-def get_restricted_company():
-    user = frappe.session.user
+
+fixtures = [
+    "Custom Field",
+    "Client Script",
+]
+
+
+def get_restricted_company(user=None):
+    user = user or frappe.session.user
     if user == "Administrator":
         return None
     restricted = frappe.get_value("User", user, "restrict_to_company")
@@ -19,67 +25,165 @@ def get_restricted_company():
     return frappe.get_value("User", user, "allowed_company")
 
 
-def get_company_filter(doctype):
-    company = get_restricted_company()
+def _has_company_field(doctype):
+    try:
+        return frappe.db.has_column(doctype, "company")
+    except Exception:
+        return False
+
+
+def get_company_filter(doctype, user=None):
+    company = get_restricted_company(user)
     if not company:
         return ""
-    if not frappe.db.has_column(doctype, "company"):
+    if doctype == "Company":
+        return f"`tabCompany`.`name` = {frappe.db.escape(company)}"
+    if not _has_company_field(doctype):
         return ""
-    return f"`tab{doctype}`.company = '{company}'"
+    return f"`tab{doctype}`.`company` = {frappe.db.escape(company)}"
 
 
-def get_user_filter():
-    user = frappe.session.user
+def get_user_filter(user=None):
+    user = user or frappe.session.user
     if user == "Administrator":
         return ""
-    company = get_restricted_company()
+    company = get_restricted_company(user)
     if company:
-        return f"`tabUser`.name = '{user}' OR `tabUser`.restrict_to_company = 0 OR `tabUser`.allowed_company = '{company}'"
+        return (
+            f"(`tabUser`.`name` = {frappe.db.escape(user)} "
+            "OR `tabUser`.`restrict_to_company` = 0 "
+            f"OR `tabUser`.`allowed_company` = {frappe.db.escape(company)})"
+        )
     return ""
 
 
-def has_company_permission(doc, perm):
+def has_company_permission(doc, user=None, permission_type=None):
     if not doc:
         return True
-    company = get_restricted_company()
+    user = user or frappe.session.user
+    company = get_restricted_company(user)
     if not company:
         return True
-    if hasattr(doc, "company") and doc.company:
-        return doc.company == company
+    if doc.doctype == "Company":
+        return doc.name == company
     if doc.doctype == "User":
-        if doc.name == frappe.session.user:
+        if doc.name == user:
             return True
         if frappe.get_value("User", doc.name, "restrict_to_company"):
             return frappe.get_value("User", doc.name, "allowed_company") == company
         return True
+    if getattr(doc, "company", None):
+        return doc.company == company
     return True
 
 
-# Permission query conditions
+def get_company_permission_query_conditions(user=None):
+    return get_company_filter("Company", user)
+
+
+def get_customer_permission_query_conditions(user=None):
+    return get_company_filter("Customer", user)
+
+
+def get_supplier_permission_query_conditions(user=None):
+    return get_company_filter("Supplier", user)
+
+
+def get_item_permission_query_conditions(user=None):
+    return get_company_filter("Item", user)
+
+
+def get_sales_order_permission_query_conditions(user=None):
+    return get_company_filter("Sales Order", user)
+
+
+def get_purchase_order_permission_query_conditions(user=None):
+    return get_company_filter("Purchase Order", user)
+
+
+def get_purchase_receipt_permission_query_conditions(user=None):
+    return get_company_filter("Purchase Receipt", user)
+
+
+def get_delivery_note_permission_query_conditions(user=None):
+    return get_company_filter("Delivery Note", user)
+
+
+def get_sales_invoice_permission_query_conditions(user=None):
+    return get_company_filter("Sales Invoice", user)
+
+
+def get_purchase_invoice_permission_query_conditions(user=None):
+    return get_company_filter("Purchase Invoice", user)
+
+
+def get_journal_entry_permission_query_conditions(user=None):
+    return get_company_filter("Journal Entry", user)
+
+
+def get_payment_entry_permission_query_conditions(user=None):
+    return get_company_filter("Payment Entry", user)
+
+
+def get_stock_entry_permission_query_conditions(user=None):
+    return get_company_filter("Stock Entry", user)
+
+
+def get_stock_reconciliation_permission_query_conditions(user=None):
+    return get_company_filter("Stock Reconciliation", user)
+
+
+def get_gl_entry_permission_query_conditions(user=None):
+    return get_company_filter("GL Entry", user)
+
+
+def get_stock_ledger_entry_permission_query_conditions(user=None):
+    return get_company_filter("Stock Ledger Entry", user)
+
+
+def get_account_permission_query_conditions(user=None):
+    return get_company_filter("Account", user)
+
+
+def get_cost_center_permission_query_conditions(user=None):
+    return get_company_filter("Cost Center", user)
+
+
+def get_workflow_permission_query_conditions(user=None):
+    return get_company_filter("Workflow", user)
+
+
+def get_server_script_permission_query_conditions(user=None):
+    return get_company_filter("Server Script", user)
+
+
+def get_client_script_permission_query_conditions(user=None):
+    return get_company_filter("Client Script", user)
+
+
 permission_query_conditions = {
-    "Company": get_company_filter,
-    "Customer": get_company_filter,
-    "Supplier": get_company_filter,
-    "Item": get_company_filter,
-    "Sales Order": get_company_filter,
-    "Purchase Order": get_company_filter,
-    "Purchase Receipt": get_company_filter,
-    "Delivery Note": get_company_filter,
-    "Sales Invoice": get_company_filter,
-    "Purchase Invoice": get_company_filter,
-    "Journal Entry": get_company_filter,
-    "Payment Entry": get_company_filter,
-    "Stock Entry": get_company_filter,
-    "Stock Reconciliation": get_company_filter,
-    "GL Entry": get_company_filter,
-    "Stock Ledger Entry": get_company_filter,
-    "Account": get_company_filter,
-    "Cost Center": get_company_filter,
-    "Workflow": get_company_filter,
-    "Server Script": get_company_filter,
-    "Client Script": get_company_filter,
-    "User": get_user_filter,
-    # Add more doctypes as needed
+    "Company": "company_restriction.hooks.get_company_permission_query_conditions",
+    "Customer": "company_restriction.hooks.get_customer_permission_query_conditions",
+    "Supplier": "company_restriction.hooks.get_supplier_permission_query_conditions",
+    "Item": "company_restriction.hooks.get_item_permission_query_conditions",
+    "Sales Order": "company_restriction.hooks.get_sales_order_permission_query_conditions",
+    "Purchase Order": "company_restriction.hooks.get_purchase_order_permission_query_conditions",
+    "Purchase Receipt": "company_restriction.hooks.get_purchase_receipt_permission_query_conditions",
+    "Delivery Note": "company_restriction.hooks.get_delivery_note_permission_query_conditions",
+    "Sales Invoice": "company_restriction.hooks.get_sales_invoice_permission_query_conditions",
+    "Purchase Invoice": "company_restriction.hooks.get_purchase_invoice_permission_query_conditions",
+    "Journal Entry": "company_restriction.hooks.get_journal_entry_permission_query_conditions",
+    "Payment Entry": "company_restriction.hooks.get_payment_entry_permission_query_conditions",
+    "Stock Entry": "company_restriction.hooks.get_stock_entry_permission_query_conditions",
+    "Stock Reconciliation": "company_restriction.hooks.get_stock_reconciliation_permission_query_conditions",
+    "GL Entry": "company_restriction.hooks.get_gl_entry_permission_query_conditions",
+    "Stock Ledger Entry": "company_restriction.hooks.get_stock_ledger_entry_permission_query_conditions",
+    "Account": "company_restriction.hooks.get_account_permission_query_conditions",
+    "Cost Center": "company_restriction.hooks.get_cost_center_permission_query_conditions",
+    "Workflow": "company_restriction.hooks.get_workflow_permission_query_conditions",
+    "Server Script": "company_restriction.hooks.get_server_script_permission_query_conditions",
+    "Client Script": "company_restriction.hooks.get_client_script_permission_query_conditions",
+    "User": "company_restriction.hooks.get_user_filter",
 }
 
 has_permission = {
