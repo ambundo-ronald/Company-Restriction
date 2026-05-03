@@ -3,7 +3,7 @@ requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "company-restriction"
+name = "company_restriction"
 authors = [{name = "Your Name", email = "your@email.com"}]
 description = "Restrict users to specific companies in ERPNext with complete data isolation"
 readme = "README.md"
