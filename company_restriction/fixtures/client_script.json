@@ -1,0 +1,10 @@
+[
+    {
+        "doctype": "Client Script",
+        "name": "User-Allow Only for This Organization",
+        "dt": "User",
+        "enabled": 1,
+        "view": "Form",
+        "script": "frappe.ui.form.on('User', {\n    refresh: function(frm) {\n        if (frappe.user.has_role('System Manager')) {\n            if (!frm.doc.__islocal) {\n                frm.add_custom_button(__('Allow only for this Organization'), function() {\n                    frm.set_value('restrict_to_company', 1);\n                    frm.refresh_field('restrict_to_company');\n                    frm.refresh_field('allowed_company');\n                }, __('Actions'));\n            }\n        } else {\n            frm.set_df_property('restrict_to_company', 'hidden', 1);\n            frm.set_df_property('allowed_company', 'hidden', 1);\n        }\n    }\n});"
+    }
+]

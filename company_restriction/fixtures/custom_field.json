@@ -1,0 +1,70 @@
+[
+    {
+        "doctype": "Custom Field",
+        "name": "User-restrict_to_company",
+        "dt": "User",
+        "fieldname": "restrict_to_company",
+        "fieldtype": "Check",
+        "label": "Restrict to Company",
+        "insert_after": "email",
+        "reqd": 0,
+        "is_custom_field": 1
+    },
+    {
+        "doctype": "Custom Field",
+        "name": "User-allowed_company",
+        "dt": "User",
+        "fieldname": "allowed_company",
+        "fieldtype": "Link",
+        "options": "Company",
+        "label": "Allowed Company",
+        "insert_after": "restrict_to_company",
+        "reqd": 0,
+        "depends_on": "restrict_to_company",
+        "is_custom_field": 1
+    },
+    {
+        "doctype": "Custom Field",
+        "name": "Item-company",
+        "dt": "Item",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "options": "Company",
+        "label": "Company",
+        "reqd": 1,
+        "is_custom_field": 1
+    },
+    {
+        "doctype": "Custom Field",
+        "name": "Workflow-company",
+        "dt": "Workflow",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "options": "Company",
+        "label": "Company",
+        "reqd": 1,
+        "is_custom_field": 1
+    },
+    {
+        "doctype": "Custom Field",
+        "name": "Server Script-company",
+        "dt": "Server Script",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "options": "Company",
+        "label": "Company",
+        "reqd": 1,
+        "is_custom_field": 1
+    },
+    {
+        "doctype": "Custom Field",
+        "name": "Client Script-company",
+        "dt": "Client Script",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "options": "Company",
+        "label": "Company",
+        "reqd": 1,
+        "is_custom_field": 1
+    }
+]
