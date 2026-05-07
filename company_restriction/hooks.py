@@ -5,7 +5,7 @@ app_description = "Restrict users to specific companies in ERPNext"
 app_email = "your@email.com"
 app_license = "MIT"
 
-import frappe
+import frappe as _frappe
 from company_restriction.__version__ import __version__ as app_version
 
 
@@ -16,18 +16,18 @@ fixtures = [
 
 
 def get_restricted_company(user=None):
-    user = user or frappe.session.user
+    user = user or _frappe.session.user
     if user == "Administrator":
         return None
-    restricted = frappe.get_value("User", user, "restrict_to_company")
+    restricted = _frappe.get_value("User", user, "restrict_to_company")
     if not restricted:
         return None
-    return frappe.get_value("User", user, "allowed_company")
+    return _frappe.get_value("User", user, "allowed_company")
 
 
 def _has_company_field(doctype):
     try:
-        return frappe.db.has_column(doctype, "company")
+        return _frappe.db.has_column(doctype, "company")
     except Exception:
         return False
 
@@ -37,22 +37,22 @@ def get_company_filter(doctype, user=None):
     if not company:
         return ""
     if doctype == "Company":
-        return f"`tabCompany`.`name` = {frappe.db.escape(company)}"
+        return f"`tabCompany`.`name` = {_frappe.db.escape(company)}"
     if not _has_company_field(doctype):
         return ""
-    return f"`tab{doctype}`.`company` = {frappe.db.escape(company)}"
+    return f"`tab{doctype}`.`company` = {_frappe.db.escape(company)}"
 
 
 def get_user_filter(user=None):
-    user = user or frappe.session.user
+    user = user or _frappe.session.user
     if user == "Administrator":
         return ""
     company = get_restricted_company(user)
     if company:
         return (
-            f"(`tabUser`.`name` = {frappe.db.escape(user)} "
+            f"(`tabUser`.`name` = {_frappe.db.escape(user)} "
             "OR `tabUser`.`restrict_to_company` = 0 "
-            f"OR `tabUser`.`allowed_company` = {frappe.db.escape(company)})"
+            f"OR `tabUser`.`allowed_company` = {_frappe.db.escape(company)})"
         )
     return ""
 
@@ -60,7 +60,7 @@ def get_user_filter(user=None):
 def has_company_permission(doc, user=None, permission_type=None):
     if not doc:
         return True
-    user = user or frappe.session.user
+    user = user or _frappe.session.user
     company = get_restricted_company(user)
     if not company:
         return True
@@ -69,8 +69,8 @@ def has_company_permission(doc, user=None, permission_type=None):
     if doc.doctype == "User":
         if doc.name == user:
             return True
-        if frappe.get_value("User", doc.name, "restrict_to_company"):
-            return frappe.get_value("User", doc.name, "allowed_company") == company
+        if _frappe.get_value("User", doc.name, "restrict_to_company"):
+            return _frappe.get_value("User", doc.name, "allowed_company") == company
         return True
     if getattr(doc, "company", None):
         return doc.company == company
